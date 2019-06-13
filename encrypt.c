@@ -13,36 +13,27 @@
 
 void aes_encrypt(char *filename, uint8_t *key) {
 	int in = open(filename, O_RDONLY);
-	int out = open(filename, O_WRONLY);
-	if(in < 0 || out < 0) {
+	if(in < 0) {
 		perror("Open Failed");
 	}
 	
 	uint8_t buf[BLOCK_SIZE];
 	size_t bytes_read;
-	
-	int fd = open("out", O_CREAT | O_TRUNC | O_WRONLY);
+
+	struct AES_ctx ctx;
+	AES_init_ctx(&ctx, key);
 
 	while((bytes_read = read(in, buf, BLOCK_SIZE)) > 0) {
 		uint8_t *input = buf;
 		input[bytes_read] = 0;
-		uint8_t output[bytes_read];
 		
-		AES128_ECB_encrypt(input, key, output);
-		//printf("%s\n", input);
-		printf("%s", output);
-		write(fd, output, bytes_read);
-	
-		uint8_t decOut[bytes_read+1];
-		AES128_ECB_decrypt(output, key, decOut);
-		decOut[bytes_read] = 0;	
-		//printf("%s\n", decOut);
+		AES_ECB_encrypt(&ctx, input);
+		printf("%s", input);
+		break;
 	}
 
-
-	close(fd);
 	close(in);
-	close(out);
+
 }
 
 void aes_decrypt(char *filename, uint8_t *key) {
@@ -54,19 +45,20 @@ void aes_decrypt(char *filename, uint8_t *key) {
 	uint8_t buf[BLOCK_SIZE];
 	size_t bytes_read;
 
+	struct AES_ctx ctx;
+	AES_init_ctx(&ctx, key);
+
 	while((bytes_read = read(in, buf, BLOCK_SIZE)) > 0) {
 		uint8_t *input = buf;
 		input[bytes_read] = 0;
-		uint8_t output[bytes_read];
-		printf("Input:		%s\n", input);
 		
-		AES128_ECB_decrypt(input, key, output);
-		output[bytes_read] = 0;
-		printf("Decrypted:	%s\n", output);
+		AES_ECB_decrypt(&ctx, input);
+		printf("%s", input);
 		break;
 	}
 
 	close(in);
+
 }
 
 int main(int argc, char **argv) {
@@ -79,7 +71,10 @@ int main(int argc, char **argv) {
 	char *file = argv[2];
 	char *key = argv[3];
 
-	uint8_t keyy[1] = { 5 };
+	
+	char *name = "Vineet Ramareddi";
+	//printf("Length: %lu\n", strlen(name));
+	uint8_t *keyy = (uint8_t *) name;
 
 	if(strcmp(option, "-e") == 0) {
 		//printf("encrypting %s...\nkey: %s\n", file, key);
