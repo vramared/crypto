@@ -58,12 +58,11 @@ void aes_decrypt(char *filename, uint8_t *key) {
 		uint8_t *input = buf;
 		input[bytes_read] = 0;
 		uint8_t output[bytes_read];
-		printf("Input:		%s\n", input);
+		//printf("Input:		%s\n", input);
 		
 		AES128_ECB_decrypt(input, key, output);
 		output[bytes_read] = 0;
-		printf("Decrypted:	%s\n", output);
-		break;
+		printf("%s", output);
 	}
 
 	close(in);
@@ -79,7 +78,8 @@ int main(int argc, char **argv) {
 	char *file = argv[2];
 	char *key = argv[3];
 
-	uint8_t keyy[1] = { 5 };
+	char *name = "Vineet Ramareddi";
+	uint8_t *keyy = (uint8_t *) name;
 
 	if(strcmp(option, "-e") == 0) {
 		//printf("encrypting %s...\nkey: %s\n", file, key);
