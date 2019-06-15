@@ -13,8 +13,7 @@
 void aes_encrypt(char *filename, uint8_t *key) {
 	/* two fd's for one file, to read and write simultaneously */
 	int in = open(filename, O_RDONLY);
-	int out = open(filename, O_WRONLY);
-	if(in < 0 || out < 0) {
+	if(in < 0) {
 		perror("Open Failed");
 		exit(1);
 	}
@@ -31,11 +30,10 @@ void aes_encrypt(char *filename, uint8_t *key) {
 		AES128_ECB_encrypt(input, key, output);
 
 		write(out, output, BLOCK_SIZE);
-	
 	}
 
 	close(in);
-	close(out);
+
 }
 /* decryption function using aes */
 void aes_decrypt(char *filename, uint8_t *key) {
@@ -58,6 +56,7 @@ void aes_decrypt(char *filename, uint8_t *key) {
 	}
 
 	close(in);
+
 }
 
 int main(int argc, char **argv) {
