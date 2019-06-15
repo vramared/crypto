@@ -29,7 +29,7 @@ void aes_encrypt(char *filename, uint8_t *key) {
 		output[BLOCK_SIZE] = 0;
 		
 		AES128_ECB_encrypt(input, key, output);
-
+		/* if last block, pad to 16 bytes (if needed), else, write bytes_read bytes */
 		if(bytes_read == BLOCK_SIZE) {
 			write(out, output, bytes_read);
 		}
