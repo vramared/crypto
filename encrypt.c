@@ -21,7 +21,7 @@ void aes_encrypt(char *filename, uint8_t *key) {
 	uint8_t buf[BLOCK_SIZE];
 	size_t bytes_read;
 	
-	int fd = open("test", O_CREAT | O_TRUNC | O_WRONLY);
+	int fd = open("test", O_CREAT | O_TRUNC | O_WRONLY, 0666);
 	if(fd < 0) {
 		perror("Test Open Failed");
 	}
@@ -29,11 +29,12 @@ void aes_encrypt(char *filename, uint8_t *key) {
 	while((bytes_read = read(in, buf, BLOCK_SIZE)) > 0) {
 		uint8_t *input = buf;
 		input[bytes_read] = 0;
-		uint8_t output[bytes_read];
+		uint8_t output[BLOCK_SIZE+1];
+		output[BLOCK_SIZE] = 0;
 		
 		AES128_ECB_encrypt(input, key, output);
-		printf("%s", output);
-		write(fd, output, bytes_read);
+		//printf("%s", output);
+		write(fd, output, BLOCK_SIZE);
 	
 	}
 
@@ -57,6 +58,7 @@ void aes_decrypt(char *filename, uint8_t *key) {
 		input[bytes_read] = 0;
 		uint8_t output[bytes_read];
 		//printf("Input:		%s\n", input);
+		//printf("\nBYTES_READ: %lu\n", bytes_read);
 		
 		AES128_ECB_decrypt(input, key, output);
 		output[bytes_read] = 0;
@@ -72,20 +74,20 @@ int main(int argc, char **argv) {
 		printf("Usage: ./encrypt [mode] [filename] [key]\n");
 		return 1;
 	}
+
 	char *option = argv[1];
 	char *file = argv[2];
-	char *key = argv[3];
+	char *charKey = argv[3];
 
-	char *name = "Vineet Ramareddi";
-	uint8_t *keyy = (uint8_t *) name;
+	uint8_t *key = (uint8_t *) charKey;
 
 	if(strcmp(option, "-e") == 0) {
 		//printf("encrypting %s...\nkey: %s\n", file, key);
-		aes_encrypt(file, keyy);
+		aes_encrypt(file, key);
 	}
 	else if(strcmp(option, "-d") == 0) {
 		printf("decrypting %s...\nkey: %s\n", file, key);
-		aes_decrypt(file, keyy);
+		aes_decrypt(file, key);
 	}
 	else {
 		printf("Option not recognized\n");
