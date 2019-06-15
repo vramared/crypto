@@ -21,7 +21,10 @@ void aes_encrypt(char *filename, uint8_t *key) {
 	uint8_t buf[BLOCK_SIZE];
 	size_t bytes_read;
 	
-	int fd = open("out", O_CREAT | O_TRUNC | O_WRONLY);
+	int fd = open("test", O_CREAT | O_TRUNC | O_WRONLY);
+	if(fd < 0) {
+		perror("Test Open Failed");
+	}
 
 	while((bytes_read = read(in, buf, BLOCK_SIZE)) > 0) {
 		uint8_t *input = buf;
@@ -29,14 +32,9 @@ void aes_encrypt(char *filename, uint8_t *key) {
 		uint8_t output[bytes_read];
 		
 		AES128_ECB_encrypt(input, key, output);
-		//printf("%s\n", input);
 		printf("%s", output);
 		write(fd, output, bytes_read);
 	
-		uint8_t decOut[bytes_read+1];
-		AES128_ECB_decrypt(output, key, decOut);
-		decOut[bytes_read] = 0;	
-		//printf("%s\n", decOut);
 	}
 
 
